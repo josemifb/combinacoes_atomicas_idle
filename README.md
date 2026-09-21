@@ -1,1 +1,0 @@
-# combinacoes_atomicas_idle
