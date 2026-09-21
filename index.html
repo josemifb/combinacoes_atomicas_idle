@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Combinações Atômicas Idle — Anel de Síntese AURORA</title>
+    
+    <!-- Ícone Oficial do Navegador e Barra de Tarefas -->
+    <link rel="icon" type="image/png" href="imagens/icones/icon.png">
+    <link rel="shortcut icon" type="image/png" href="imagens/icones/icon.png">
+    <link rel="apple-touch-icon" href="imagens/icones/icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;1,700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/menu.css">
+    <link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- TELA 1: Menu Principal -->
+        <div id="screen-menu" class="screen active">
+            <div class="menu-content">
+                <div class="logo-card">
+                    <h1 class="game-title" data-i18n="title_main">COMBINAÇÕES ATÔMICAS IDLE</h1>
+                    <p class="game-subtitle" data-i18n="subtitle_main">LABORATÓRIO DE ACELERAÇÃO QUÂNTICA</p>
+                </div>
+                
+                <div class="menu-actions" id="menu-actions-container">
+                    <button id="btn-start" class="pixel-btn" data-i18n="btn_start">INICIAR EXPERIMENTO</button>
+                    <button id="btn-resume-game" class="pixel-btn btn-resume hidden" data-i18n="btn_resume">RETOMAR PROGRESSO</button>
+                    <button id="btn-new-game" class="pixel-btn btn-new-game hidden" data-i18n="btn_new_game">NOVO EXPERIMENTO</button>
+                </div>
+            </div>
+
+            <div id="start-screen-controls" class="start-screen-controls">
+                <div class="control-select-group">
+                    <label for="start-theme-select" class="sr-only" data-i18n="lbl_theme">Tema</label>
+                    <select id="start-theme-select" class="pixel-select">
+                        <option value="dark">🌙 Escuro</option>
+                        <option value="light">☀️ Claro</option>
+                    </select>
+                </div>
+
+                <div class="control-select-group">
+                    <label for="language-select" class="sr-only" data-i18n="lbl_language">Idioma</label>
+                    <select id="language-select" class="pixel-select">
+                        <option value="pt" selected>PT - Português</option>
+                        <option value="en">EN - English</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA 2: Terminal de Diálogo -->
+        <div id="screen-intro" class="screen hidden">
+            <div class="dialogue-terminal-container">
+                <div class="npc-avatar-wrapper">
+                    <div class="npc-avatar-circular" id="npc-avatar"></div>
+                    <span class="status-indicator">● TRANSMISSÃO ATIVA</span>
+                </div>
+
+                <div class="dialogue-body">
+                    <div class="speaker-header">
+                        <span class="speaker-name" id="speaker-title" data-i18n="speaker_name">DRA. ARIS THORNE</span>
+                        <span class="speaker-role" data-i18n="speaker_role">Líder de Pesquisa e Síntese Elemental</span>
+                    </div>
+
+                    <p class="dialogue-text" id="dialogue-text"></p>
+                    
+                    <div class="dialogue-interactive-zone">
+                        <input type="text" id="player-name-input" class="hidden" data-i18n-placeholder="placeholder_name" placeholder="Digite seu nome..." maxlength="18" autocomplete="off">
+                        <button id="btn-dialogue-action" class="pixel-btn-action" data-i18n="btn_next">AVANÇAR ▶</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA 3: GRELHA OPERACIONAL (HUD) -->
+        <div id="screen-hud" class="screen hidden">
+            <header class="hud-topbar">
+                <div class="topbar-box box-player-name">
+                    <span class="topbar-tag" data-i18n="tag_user">OPERADOR</span>
+                    <strong id="display-player-name" class="topbar-value">---</strong>
+                </div>
+
+                <div class="topbar-box box-player-level">
+                    <span class="topbar-tag" data-i18n="tag_level">NÍVEL</span>
+                    <strong id="display-player-level" class="topbar-value">LV 1</strong>
+                </div>
+
+                <div class="topbar-box box-player-prestige">
+                    <span class="topbar-tag" data-i18n="tag_prestige_box">PRESTÍGIO</span>
+                    <div class="prestige-val-wrapper">
+                        <strong id="display-prestige-tag" class="topbar-value highlight-cyan">LV 0</strong>
+                        <span id="display-prestige-multiplier" class="topbar-sub-badge">BÔNUS 1.0x</span>
+                    </div>
+                </div>
+
+                <div class="topbar-box box-missions box-missions-primary">
+                    <div class="mission-header-line">
+                        <span class="topbar-tag" data-i18n="tag_primary_mission">MISSÃO PRINCIPAL</span>
+                        <span id="display-prestige-progress" class="prestige-indicator">PRESTÍGIO 2%</span>
+                    </div>
+                    <span id="display-current-mission" class="mission-title">Carregando diretriz...</span>
+                    <div class="mission-progress-track">
+                        <div id="mission-progress-bar" class="mission-progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="topbar-box box-missions box-missions-secondary">
+                    <div class="mission-header-line">
+                        <span class="topbar-tag" data-i18n="tag_secondary_mission">MISSÃO SECUNDÁRIA</span>
+                        <div class="bounty-reward-wrapper">
+                            <span id="display-bounty-reward" class="bounty-reward-badge">+2</span>
+                            <img src="imagens/moedas/foton.png" class="currency-badge-img" alt="" onerror="this.style.display='none';">
+                        </div>
+                    </div>
+                    <span id="display-secondary-mission" class="mission-title">Carregando desafio...</span>
+                    <div class="mission-progress-track">
+                        <div id="secondary-progress-bar" class="mission-progress-fill fill-secondary" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="topbar-box box-currency">
+                    <span class="topbar-tag" data-i18n="tag_coins">CAPITAL QUÂNTICO</span>
+                    <div class="currencies-container">
+                        <div class="currency-item" title="Moedas Quânticas">
+                            <img src="imagens/moedas/moeda.png" class="currency-img-icon" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                            <span class="coin-icon fallback-emoji" style="display:none;">⚛️</span>
+                            <strong id="display-coins" class="topbar-value">0</strong>
+                        </div>
+                        <div class="currency-item" title="Fótons Quânticos">
+                            <img src="imagens/moedas/foton.png" class="currency-img-icon" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                            <span class="coin-icon fallback-emoji" style="display:none;">🌌</span>
+                            <strong id="display-photons" class="topbar-value photon-value">0</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btn-open-config" class="topbar-box box-config" aria-label="Sistema e Prestígio">
+                    <span class="config-icon">⚙️</span>
+                    <span class="config-label" data-i18n="btn_config">SISTEMA</span>
+                </button>
+            </header>
+
+            <main class="hud-workspace">
+                <section class="workspace-panel panel-accelerator" id="panel-accelerator">
+                    <div class="panel-header">
+                        <div class="panel-header-left">
+                            <h2 class="panel-title" data-i18n="title_accelerator">ANEL DE SÍNTESE AURORA</h2>
+                            <div class="panel-badge" data-i18n="status_active">ATIVO</div>
+                        </div>
+
+                        <div class="fusion-level-ctrl">
+                            <span id="display-fusion-level-tag" class="fusion-level-badge">SÍNTESE NÍVEL 1</span>
+                            <button id="btn-upgrade-fusion-level" class="pixel-btn-buy micro">
+                                <span id="cost-upgrade-fusion-level">EVOLUIR 120</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="panel-content accelerator-view">
+                        <canvas id="accelerator-canvas" role="button" tabindex="0" aria-label="Anel de Síntese AURORA. Clique ou pressione Espaço para gerar uma moeda."></canvas>
+                        <div class="accelerator-instruction" aria-hidden="true">CLIQUE NA TELA PARA GERAR UMA MOEDA</div>
+                        <button id="btn-open-periodic-table" class="periodic-table-button" type="button"
+                                aria-label="Abrir Tabela Periódica das Descobertas" title="Tabela Periódica das Descobertas">
+                            <img class="feature-button-image" src="imagens/icones/tabela_periodica.png" alt="" aria-hidden="true">
+                            <span class="periodic-button-progress"><strong id="periodic-button-elements">1/118</strong><small id="periodic-button-badges">★ 0/11</small></span>
+                        </button>
+                        <!-- A linha do tempo compartilha o espaço de comandos da AURORA. -->
+                        <button id="btn-open-history" class="history-button" type="button"
+                                aria-label="Abrir Fragmentos da História da Química" title="Fragmentos da História da Química">
+                            <img class="feature-button-image" src="imagens/icones/fragmentos_historias.png" alt="" aria-hidden="true">
+                            <span class="periodic-button-progress"><strong id="history-button-count">0/13</strong><small id="history-button-status">LINHA DO TEMPO</small></span>
+                        </button>
+                        <!-- Só fica visível quando a missão final autoriza o prestígio. -->
+                        <button id="btn-prestige-center" class="prestige-center-button hidden" type="button">REALIZAR PRESTÍGIO</button>
+                        <button id="btn-open-tutorial" class="tutorial-help-button hidden" type="button"
+                                aria-label="Rever tutorial" title="Rever tutorial">?</button>
+                        <div class="accelerator-sensor-overlay">
+                            <span class="sensor-label" id="sensor-status-label">
+                                <span id="sensor-detectors">DETECTORES: 1/10</span>
+                                <span aria-hidden="true">|</span>
+                                <span id="sensor-speed">VELOCIDADE: +0%</span>
+                                <span aria-hidden="true">|</span>
+                                <span id="sensor-income">RENDA/S: 0</span>
+                            </span>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="workspace-column-right">
+                    <section class="workspace-panel panel-fusion" id="panel-fusion">
+                        <div class="panel-header">
+                            <h2 class="panel-title" data-i18n="title_fusion">CÂMARA DE SÍNTESE</h2>
+                            <span class="panel-sub" id="fusion-limit-hint">Limite inicial: H — Z=1 + H — Z=1</span>
+                            <button id="btn-buy-slot" class="pixel-btn-buy micro" type="button">Liberar slot 5</button>
+                        </div>
+                        <div class="panel-content fusion-grid-container" id="fusion-slots-container"></div>
+                    </section>
+
+                    <section class="workspace-panel panel-upgrades" id="panel-upgrades">
+                        <div class="panel-header">
+                            <h2 class="panel-title" data-i18n="title_upgrades">MELHORIAS & INJEÇÃO</h2>
+                        </div>
+                        <div class="panel-content upgrades-grid" id="upgrades-container">
+                            <div class="action-card-grid" id="card-buy-atom">
+                                <div class="action-details">
+                                    <strong class="action-name" id="label-buy-atom">Injetor de Núcleos</strong>
+                                    <span class="action-desc" id="desc-buy-atom">Adiciona H — Z=1 à câmara</span>
+                                </div>
+                                <button class="pixel-btn-buy btn-with-icon" id="btn-buy-current-atom">
+                                    <span id="cost-buy-current-atom">10</span>
+                                    <img src="imagens/moedas/moeda.png" class="btn-currency-icon" alt="" onerror="this.style.display='none';">
+                                </button>
+                            </div>
+
+                            <div class="action-card-grid" id="card-upgrade-injection">
+                                <div class="action-details">
+                                    <strong class="action-name" id="label-upgrade-injection">Calibração do Injetor</strong>
+                                    <span class="action-desc" id="desc-upgrade-injection">Libera núcleos de Z mais alto</span>
+                                </div>
+                                <button class="pixel-btn-buy btn-with-icon" id="btn-upgrade-injection">
+                                    <span id="cost-upgrade-injection">65</span>
+                                    <img src="imagens/moedas/moeda.png" class="btn-currency-icon" alt="" onerror="this.style.display='none';">
+                                </button>
+                            </div>
+
+                            <div class="action-card-grid" id="card-upgrade-speed">
+                                <div class="action-details">
+                                    <strong class="action-name" data-i18n="upgrade_speed">Quadrupolos Magnéticos</strong>
+                                    <span class="action-desc" id="desc-upgrade-speed">Acelera a circulação e as detecções</span>
+                                </div>
+                                <button class="pixel-btn-buy btn-with-icon" id="btn-upgrade-speed">
+                                    <span id="cost-upgrade-speed">150</span>
+                                    <img src="imagens/moedas/moeda.png" class="btn-currency-icon" alt="" onerror="this.style.display='none';">
+                                </button>
+                            </div>
+
+                            <div class="action-card-grid" id="card-upgrade-detector">
+                                <div class="action-details">
+                                    <strong class="action-name" data-i18n="upgrade_detector">Estação de Detecção</strong>
+                                    <span class="action-desc" id="desc-upgrade-detector">Gera renda a cada passagem</span>
+                                </div>
+                                <button class="pixel-btn-buy btn-with-icon" id="btn-upgrade-detector">
+                                    <span id="cost-upgrade-detector">300</span>
+                                    <img src="imagens/moedas/moeda.png" class="btn-currency-icon" alt="" onerror="this.style.display='none';">
+                                </button>
+                            </div>
+                            <div class="action-card-grid module-card" id="card-module-cryo">
+                                <div class="action-details"><strong class="action-name">Criogenia Supercondutora</strong><span class="action-desc" id="desc-module-cryo">Estabiliza sínteses além do ferro</span></div>
+                                <button class="pixel-btn-buy micro" id="btn-module-cryo" type="button">2500</button>
+                            </div>
+                            <div class="action-card-grid module-card" id="card-module-toroidal">
+                                <div class="action-details"><strong class="action-name">Confinamento Toroidal</strong><span class="action-desc" id="desc-module-toroidal">Mantém núcleos pesados no anel</span></div>
+                                <button class="pixel-btn-buy micro" id="btn-module-toroidal" type="button">2500</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!--
+                        Em telas estreitas esta faixa participa do fluxo normal, logo
+                        depois das melhorias. Cada atalho mantém nome e finalidade
+                        legíveis; o custo de H continua sincronizado pelo HUD.
+                    -->
+                    <nav id="mobile-market-bar" class="mobile-market-bar" aria-label="Atalhos do Mercado Quântico">
+                        <button id="btn-open-mobile-market" type="button" aria-haspopup="dialog" aria-controls="panel-shop" aria-expanded="false">
+                            <span aria-hidden="true">🛒</span>
+                            <span class="mobile-market-copy"><strong>MERCADO QUÂNTICO</strong><small>6 melhorias especiais</small></span>
+                        </button>
+                        <button id="btn-mobile-buy-proton" type="button">
+                            <span aria-hidden="true">⚛</span>
+                            <span class="mobile-market-copy"><strong>COMPRAR H</strong><small>Base para fusões · <span id="mobile-proton-cost">60</span></small></span>
+                        </button>
+                    </nav>
+
+                    <!-- MERCADO QUÂNTICO COM POSICIONAMENTO REORGANIZADO -->
+                    <section class="workspace-panel panel-shop" id="panel-shop">
+                        <div class="panel-header">
+                            <h2 class="panel-title" id="mobile-market-title" data-i18n="title_shop">MERCADO QUÂNTICO</h2>
+                            <button id="btn-close-mobile-market" class="mobile-market-close" type="button" aria-label="Fechar Mercado Quântico">&times;</button>
+                        </div>
+                        <div class="panel-content shop-grid-custom" id="shop-container">
+                            
+                            <!-- COLUNA ESQUERDA: PRÓTON (MATÉRIA-PRIMA) -->
+                            <div class="shop-item-card card-raw-proton" id="shop-item-proton">
+                                <div class="shop-card-top">
+                                    <div class="shop-item-icon proton-icon-glow">
+                                    <img src="imagens/atomos/1_hidrogenio.png" class="shop-proton-img" alt="H — Z=1" onerror="this.onerror=null; this.src=atomTextures.generateFallback(ATOM_REGISTRY[1]);">
+                                    </div>
+                                    <div class="shop-meta">
+                                        <strong class="shop-title proton-title" data-i18n="shop_buy_proton">Núcleo-base H — Z=1</strong>
+                                        <span class="shop-badge-info badge-proton" data-i18n="badge_proton">Matéria-Prima</span>
+                                    </div>
+                                </div>
+                                <div class="shop-card-bottom">
+                                    <div class="shop-price-tag">
+                                        <span id="label-proton-cost">60</span>
+                                    <img src="imagens/moedas/moeda.png" class="btn-currency-icon" alt="" onerror="this.style.display='none';">
+                                    </div>
+                                    <button class="pixel-btn-buy small btn-proton" id="btn-buy-proton" data-i18n="btn_buy">INJETAR</button>
+                                </div>
+                            </div>
+
+                            <!-- GRADE DIREITA 2x3 REORGANIZADA -->
+                            <div class="shop-subgrid-container">
+                                
+                                <!-- FILEIRA 1, COLUNA 1: COLISOR -->
+                                <div class="shop-compact-card" id="shop-item-collider">
+                                    <div class="compact-card-info">
+                                        <span class="compact-icon">⚡</span>
+                                        <div class="compact-text-group">
+                                            <strong class="compact-title">Pulso de Colisão</strong>
+                                            <span class="compact-desc">Amplifica a renda em 25%</span>
+                                        </div>
+                                    </div>
+                                    <div class="compact-card-action">
+                                        <span class="compact-status" id="timer-collider">INATIVO</span>
+                                        <button class="pixel-btn-buy micro btn-photon-buy" id="btn-buy-collider">
+                                            <span>3</span>
+                                            <img src="imagens/moedas/foton.png" class="btn-currency-icon photon" alt="" onerror="this.style.display='none';">
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- FILEIRA 1, COLUNA 2: CRIOGENIA -->
+                                <div class="shop-compact-card" id="shop-item-cryo">
+                                    <div class="compact-card-info">
+                                        <span class="compact-icon">❄️</span>
+                                        <div class="compact-text-group">
+                                            <strong class="compact-title">Resfriamento do Feixe</strong>
+                                            <span class="compact-desc">Aumenta a circulação em 15%</span>
+                                        </div>
+                                    </div>
+                                    <div class="compact-card-action">
+                                        <span class="compact-status" id="timer-cryo">INATIVO</span>
+                                        <button class="pixel-btn-buy micro btn-photon-buy" id="btn-buy-cryo">
+                                            <span>4</span>
+                                            <img src="imagens/moedas/foton.png" class="btn-currency-icon photon" alt="" onerror="this.style.display='none';">
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- FILEIRA 1, COLUNA 3: CONDENSADOR -->
+                                <div class="shop-compact-card" id="shop-item-condenser">
+                                    <div class="compact-card-info">
+                                        <span class="compact-icon">🔮</span>
+                                        <div class="compact-text-group">
+                                            <strong class="compact-title">Condensador Quântico</strong>
+                                            <span class="compact-desc">Multiplica a renda por 1,5</span>
+                                        </div>
+                                    </div>
+                                    <div class="compact-card-action">
+                                        <span class="compact-status" id="timer-condenser">INATIVO</span>
+                                        <button class="pixel-btn-buy micro btn-photon-buy" id="btn-buy-condenser">
+                                            <span>5</span>
+                                            <img src="imagens/moedas/foton.png" class="btn-currency-icon photon" alt="" onerror="this.style.display='none';">
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- FILEIRA 2, COLUNA 1: SALTO TEMPORAL (NOVO LUGAR: EMBAIXO DO COLISOR) -->
+                                <div class="shop-compact-card card-timeskip" id="shop-item-timeskip">
+                                    <div class="compact-card-info">
+                                        <span class="compact-icon">⏩</span>
+                                        <div class="compact-text-group">
+                                            <strong class="compact-title cyan-text" data-i18n="shop_timeskip">Salto Temporal</strong>
+                                            <span class="compact-desc" id="desc-timeskip-val">+1h de Renda</span>
+                                        </div>
+                                    </div>
+                                    <div class="compact-card-action">
+                                        <span class="badge-instant-indicator">INSTANTÂNEO</span>
+                                        <button class="pixel-btn-buy micro btn-timeskip" id="btn-buy-timeskip">
+                                            <span id="cost-buy-timeskip">1</span>
+                                            <img src="imagens/moedas/foton.png" class="btn-currency-icon photon" alt="" onerror="this.style.display='none';">
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- FILEIRA 2, COLUNA 2: EXPANSÃO OFFLINE (NOVO LUGAR: EMBAIXO DE CRIOGENIA) -->
+                                <div class="shop-compact-card card-permanent" id="shop-item-offline">
+                                    <div class="compact-card-info">
+                                        <span class="compact-icon">⏳</span>
+                                        <div class="compact-text-group">
+                                            <strong class="compact-title gold-text" data-i18n="shop_offline_cap">Expansão Offline</strong>
+                                            <span class="compact-desc" id="desc-offline-cap">1h ➜ 2h Max</span>
+                                        </div>
+                                    </div>
+                                    <div class="compact-card-action">
+                                        <span class="badge-perm-indicator">PERMANENTE</span>
+                                        <button class="pixel-btn-buy micro btn-perm-gold" id="btn-buy-offline">
+                                            <span id="cost-buy-offline">2</span>
+                                            <img src="imagens/moedas/foton.png" class="btn-currency-icon photon" alt="" onerror="this.style.display='none';">
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- FILEIRA 2, COLUNA 3: SORTE QUÂNTICA (NOVO LUGAR: EMBAIXO DO CONDENSADOR) -->
+                                <div class="shop-compact-card card-permanent" id="shop-item-luck">
+                                    <div class="compact-card-info">
+                                        <span class="compact-icon">🎲</span>
+                                        <div class="compact-text-group">
+                                            <strong class="compact-title gold-text" data-i18n="shop_luck">Sorte Quântica</strong>
+                                            <span class="compact-desc" id="desc-luck-val">0% ➜ 5% (2x)</span>
+                                        </div>
+                                    </div>
+                                    <div class="compact-card-action">
+                                        <span class="badge-perm-indicator">PERMANENTE</span>
+                                        <button class="pixel-btn-buy micro btn-perm-gold" id="btn-buy-luck">
+                                            <span id="cost-buy-luck">2</span>
+                                            <img src="imagens/moedas/foton.png" class="btn-currency-icon photon" alt="" onerror="this.style.display='none';">
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+
+        <!-- MODAL DE SISTEMA -->
+        <div id="modal-system" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-system-title">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modal-system-title" data-i18n="modal_system_title">TERMINAL DE CONTROLE & PRESTÍGIO</h3>
+                    <button id="btn-close-modal" class="modal-close-btn" aria-label="Fechar configurações">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="settings-group">
+                        <label class="settings-label" data-i18n="lbl_theme">Tema Visual da Interface</label>
+                        <select id="modal-theme-select" class="pixel-select">
+                            <option value="dark">Modo Escuro (Laboratório Noturno)</option>
+                            <option value="light">Modo Claro (Sala Limpa Industrial)</option>
+                        </select>
+                    </div>
+
+                    <div class="settings-group">
+                        <label class="settings-label" data-i18n="lbl_language">Idioma do Sistema</label>
+                        <select id="modal-language-select" class="pixel-select">
+                            <option value="pt">Português</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+
+                    <div class="recovery-section">
+                        <h4 class="recovery-title" data-i18n="title_recovery">PROTOCOLO DE RECUPERAÇÃO</h4>
+                        <p class="recovery-desc" data-i18n="desc_recovery">
+                            A injeção manual de emergência só é autorizada se a câmara estiver 100% vazia e desprovida de átomos.
+                        </p>
+                        <div class="recovery-actions">
+                            <button id="btn-emergency-inject" class="pixel-btn-action btn-emergency" data-i18n="btn_emergency_inject">
+                                ⚛️ INJETAR 1H DE EMERGÊNCIA
+                            </button>
+                            <button id="btn-reset-save" class="pixel-btn-action btn-danger-reset" data-i18n="btn_reset_save">
+                                ⚠️ REINICIAR SAVE DO ZERO
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="prestige-section">
+                        <h4 class="prestige-title" data-i18n="prestige_title">ASCENSÃO QUÂNTICA (PRESTÍGIO)</h4>
+                        <p class="prestige-desc" data-i18n="prestige_desc">
+                            Reinicia a câmara de síntese e as melhorias operacionais em troca de um multiplicador permanente de capital quântico (LV = LV + 1).
+                        </p>
+                        <div class="prestige-status-box">
+                            <div><strong>Prestígio Atual:</strong> <span id="prestige-current-level">0</span></div>
+                            <div><strong>Multiplicador Permanente:</strong> <span id="prestige-current-mult">1.0x</span></div>
+                            <div><strong>Condição de Ativação:</strong> <span id="prestige-requirement-text">Requer Nível 50 (Atual: LV 1)</span></div>
+                        </div>
+                        <button id="btn-trigger-prestige" class="pixel-btn-action btn-prestige" disabled>
+                            REALIZAR ASCENSÃO QUÂNTICA
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-status" class="sr-status" role="status" aria-live="polite">Jogo pronto.</div>
+        <div id="storage-warning" class="storage-warning hidden" role="status" aria-live="polite"></div>
+        <div id="toast-container" class="toast-container" aria-hidden="true"></div>
+
+        <div id="periodic-overlay" class="periodic-overlay hidden" role="dialog" aria-modal="true"
+             aria-labelledby="periodic-title" aria-describedby="periodic-summary">
+            <section class="periodic-modal">
+                <header class="periodic-header">
+                    <div>
+                        <span class="periodic-kicker" data-i18n="periodic_kicker">ARQUIVO VITALÍCIO DO AURORA</span>
+                        <h2 id="periodic-title" data-i18n="periodic_title">TABELA PERIÓDICA DAS DESCOBERTAS</h2>
+                    </div>
+                    <div class="periodic-progress" id="periodic-summary">
+                        <strong id="periodic-discovery-count">1 / 118</strong>
+                        <span data-i18n="periodic_discovered">elementos descobertos</span>
+                        <div class="periodic-progress-track" aria-hidden="true"><i id="periodic-progress-fill"></i></div>
+                    </div>
+                    <button id="btn-close-periodic-table" class="periodic-close" type="button" aria-label="Fechar tabela periódica">&times;</button>
+                </header>
+                <div class="periodic-main">
+                    <div id="periodic-grid" class="periodic-grid" role="grid" aria-label="Tabela periódica com 118 elementos"></div>
+                </div>
+                <footer class="periodic-achievements">
+                    <div class="achievement-heading">
+                        <strong data-i18n="periodic_achievements">CONQUISTAS DA TABELA</strong>
+                        <span id="periodic-achievement-count">0 / 11 ★</span>
+                    </div>
+                    <div id="periodic-achievement-list" class="achievement-list"></div>
+                </footer>
+            </section>
+        </div>
+
+        <!-- LINHA DO TEMPO: preenchida pelo HistoryController a partir dos Markdown. -->
+        <div id="history-overlay" class="history-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="history-title">
+            <section class="history-modal">
+                <header class="history-header">
+                    <div><span>ARQUIVO HISTÓRICO DA AURORA</span><h2 id="history-title">FRAGMENTOS DA HISTÓRIA DA QUÍMICA</h2></div>
+                    <strong id="history-progress">0 / 13</strong>
+                    <button id="btn-close-history" class="periodic-close" type="button" aria-label="Fechar linha do tempo">&times;</button>
+                </header>
+                <div id="history-timeline" class="history-timeline" aria-label="Linha do tempo histórica"></div>
+                <footer class="history-legend">Cada prestígio recupera o próximo fragmento desta história.</footer>
+            </section>
+        </div>
+
+        <!-- LEITOR HISTÓRICO: uma fala por vez, com cenário e personagem. -->
+        <div id="history-reader-overlay" class="history-reader-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="history-reader-title">
+            <article id="history-reader" class="history-reader">
+                <button id="btn-close-history-reader" class="periodic-close history-reader-close" type="button" aria-label="Fechar fragmento">&times;</button>
+                <header class="history-reader-heading"><span id="history-reader-period"></span><h2 id="history-reader-title"></h2></header>
+                <div class="history-dialogue-stage">
+                    <img id="history-speaker-image" class="history-speaker-image" alt="">
+                    <section class="history-dialogue-box">
+                        <strong id="history-speaker-name"></strong>
+                        <p id="history-dialogue-text"></p>
+                        <div class="history-reader-controls">
+                            <span id="history-reader-step"></span>
+                            <button id="btn-history-previous" type="button">◀ ANTERIOR</button>
+                            <button id="btn-history-next" type="button">AVANÇAR ▶</button>
+                        </div>
+                    </section>
+                </div>
+            </article>
+        </div>
+
+        <!-- A recompensa permanece pendente no save até o jogador confirmá-la. -->
+        <div id="history-reward-overlay" class="history-reward-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="history-reward-title">
+            <article class="history-reward-card">
+                <span>PRESTÍGIO CONCLUÍDO</span><h2 id="history-reward-title">FRAGMENTO DA HISTÓRIA DESBLOQUEADO</h2>
+                <div id="history-reward-preview" class="history-reward-preview"></div>
+                <strong id="history-reward-name"></strong>
+                <div><button id="btn-history-reward-later" type="button">GUARDAR NA LINHA DO TEMPO</button><button id="btn-history-reward-now" type="button">CONHECER AGORA</button></div>
+            </article>
+        </div>
+
+        <div id="discovery-overlay" class="discovery-overlay hidden" role="dialog" aria-modal="true"
+             aria-labelledby="discovery-title" aria-describedby="discovery-character-line">
+            <article id="discovery-card" class="discovery-card">
+                <header class="discovery-header">
+                    <div class="discovery-heading">
+                        <span class="discovery-kicker" data-i18n="discovery_kicker">UM NOVO ELEMENTO FOI DESCOBERTO</span>
+                        <h2 id="discovery-title"><span id="discovery-element-name">Elemento</span> <small id="discovery-element-z">Z=0</small></h2>
+                    </div>
+                </header>
+                <div class="discovery-body">
+                    <div class="discovery-visual">
+                        <div class="discovery-presenter">
+                            <img id="discovery-presenter-image" src="imagens/personagens/01_aris_thorne.jpg" alt="">
+                            <div class="discovery-presenter-copy">
+                                <strong id="discovery-presenter-name">Dr.ª Aris Thorne</strong>
+                                <span id="discovery-presenter-role">Líder de Pesquisa e Síntese Elemental</span>
+                            </div>
+                        </div>
+                        <p id="discovery-character-line" class="discovery-speech"></p>
+                        <div class="discovery-atom-frame">
+                            <img id="discovery-atom-image" src="" alt="">
+                        </div>
+                    </div>
+                    <div class="discovery-information">
+                        <dl id="discovery-facts" class="discovery-facts"></dl>
+                        <div class="discovery-notes">
+                            <section><h3>Descoberta histórica</h3><p id="discovery-history"></p></section>
+                            <section><h3>Ocorrência</h3><p id="discovery-occurrence"></p></section>
+                            <section><h3>Aplicações e cotidiano</h3><p id="discovery-applications"></p></section>
+                            <section><h3>Curiosidade</h3><p id="discovery-curiosity"></p></section>
+                            <section class="discovery-safety"><h3>Uso responsável</h3><p id="discovery-safety"></p></section>
+                        </div>
+                    </div>
+                </div>
+                <footer class="discovery-footer">
+                    <p data-i18n="discovery_saved">Descoberta registrada permanentemente neste save.</p>
+                    <button id="btn-close-discovery" class="pixel-btn-action" type="button" data-i18n="discovery_continue">CONTINUAR PESQUISA ▶</button>
+                </footer>
+            </article>
+        </div>
+
+        <div id="tutorial-overlay" class="tutorial-overlay hidden" role="dialog" aria-modal="true"
+             aria-labelledby="tutorial-speaker" aria-describedby="tutorial-text">
+            <div id="tutorial-spotlight" class="tutorial-spotlight" aria-hidden="true"></div>
+            <section id="tutorial-card" class="tutorial-card" tabindex="-1">
+                <div class="tutorial-arrow" aria-hidden="true"></div>
+                <div class="tutorial-character">
+                    <img id="tutorial-avatar" src="imagens/personagens/01_aris_thorne.jpg" alt="">
+                </div>
+                <div class="tutorial-copy">
+                    <div class="tutorial-heading">
+                        <strong id="tutorial-speaker">DR.ª ARIS THORNE</strong>
+                        <span id="tutorial-role">Líder de Pesquisa e Síntese Elemental</span>
+                    </div>
+                    <p id="tutorial-text"></p>
+                    <div class="tutorial-footer">
+                        <span id="tutorial-progress" aria-hidden="true"></span>
+                        <button id="btn-tutorial-next" class="pixel-btn-action" type="button">AVANÇAR ▶</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Fundo independente do modal: desfoca o HUD sem afetar a nitidez da loja. -->
+    <div id="mobile-market-backdrop" class="mobile-market-backdrop hidden" aria-hidden="true"></div>
+
+    <!-- O crédito ocupa uma linha própria do documento e jamais cobre o jogo. -->
+    <footer id="global-project-footer" class="global-project-footer">
+        © 2026 José Miguel · Criado com apoio de inteligência artificial generativa · Projeto disponibilizado para acesso público.
+    </footer>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/assets.js"></script>
+    <script src="js/characters.js"></script>
+    <script src="js/atoms.js"></script>
+    <script src="js/element-profiles.generated.js"></script>
+    <script src="js/history-fragments.generated.js"></script>
+    <script src="js/element-encyclopedia.js"></script>
+    <script src="js/rules.js"></script>
+    <script src="js/engine.js"></script>
+    <script src="js/fusion.js"></script>
+    <script src="js/missions.js"></script>
+    <script src="js/intro.js"></script>
+    <script src="js/hardening.js"></script>
+    <script src="js/tutorial.js"></script>
+    <script src="js/discovery.js"></script>
+    <script src="js/periodic-table.js"></script>
+    <script src="js/history.js"></script>
+</body>
+</html>
